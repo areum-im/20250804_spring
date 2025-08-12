@@ -31,4 +31,8 @@ public class MemoServiceImpl implements MemoService {
     return result.stream().map(memo -> entityToDto(memo)).toList();
   }
 
+  @Override
+  public MemoDTO registMemo(MemoDTO memoDTO) {
+    return null;
+  }
 }
