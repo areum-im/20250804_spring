@@ -1,7 +1,6 @@
 package com.example.ex3.repository;
 
 import com.example.ex3.entity.Memo;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.test.annotation.Commit;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +36,9 @@ class MemoRepositoryTests {
       @Override
       public void accept(int i) {
         Memo memo = Memo.builder()
-            .memoText("Sample..." + i)
+            .memoText("Sample... " + i)
             .build();
         memoRepository.save(memo);
-
-
       }
     });
   }
@@ -47,8 +46,7 @@ class MemoRepositoryTests {
   @Test
   public void testSelect() {
     Long mno = 100L;
-    Optional<Memo> result = memoRepository.findById(100L);
-//  Optional<Memo> result = memoRepository.getOne(mno);
+    Optional<Memo> result = memoRepository.findById(mno);
     if (result.isPresent()) {
       Memo memo = result.get();
       System.out.println(memo);
@@ -58,7 +56,7 @@ class MemoRepositoryTests {
   @Transactional
   @Test
   public void testSelect2() {
-    Long mno = 100L;
+    Long mno = 50L;
     Memo memo = memoRepository.getOne(mno);
     System.out.println(memo);
   }
@@ -76,17 +74,16 @@ class MemoRepositoryTests {
 
   @Test
   public void testPageDefault() {
-    Pageable pageable = PageRequest.of(0, 10);
+    Pageable pageable = PageRequest.of(0, 10); // 0 page에 10개의 데이터를 표기
     Page<Memo> result = memoRepository.findAll(pageable);
-    System.out.println("=========================================");
     System.out.println(result);
-    System.out.println("Total Pages:" + result.getTotalPages()); // 총 페이지 수
-    System.out.println("Total Count:" + result.getTotalElements()); // 총
-    System.out.println("Page Number:" + result.getNumber()); // 현재 페이지 번호 :: 0부터 시작
-    System.out.println("Page Size:" + result.getSize()); // 페이지 당 데이터 개수
+    System.out.println("Total Pages:" + result.getTotalPages()); //총 페이지 수
+    System.out.println("Total Count:" + result.getTotalElements()); // 총 개별 건수
+    System.out.println("Page Number:" + result.getNumber()); // 현재 페이지 번호::0부터시작
+    System.out.println("Page Size:" + result.getSize()); // 페이지당 데이터 갯수
     System.out.println("Next Page:" + result.hasNext()); // 다음 페이지 유무
-    System.out.println("First Page:" + result.isFirst()); // 첫 페이지인지 확인
-    System.out.println("=========================================");
+    System.out.println("First Page:" + result.isFirst()); // 첫페이지 인지 확인
+    System.out.println("===================================================");
     for (Memo memo : result.getContent()) {
       System.out.println(memo);
     }
@@ -95,7 +92,7 @@ class MemoRepositoryTests {
   @Test
   public void testSort() {
     Sort sort1 = Sort.by("mno").descending();
-//  Pageable pageable = PageRequest.of(5, 10, sort1);
+//    Pageable pageable = PageRequest.of(0, 10, sort1);
     Sort sort2 = Sort.by("memoText").ascending();
     Sort sortAll = sort1.and(sort2);
     Pageable pageable = PageRequest.of(5, 10, sortAll);
@@ -104,7 +101,7 @@ class MemoRepositoryTests {
   }
 
   @Test
-  public void findByMnoBetweenOrderByMnoDesc() {
+  public void testFindByMnoBetweenOrderByMnoDesc() {
     List<Memo> list = memoRepository.findByMnoBetweenOrderByMnoDesc(1l, 10L);
     for (Memo m : list) System.out.println(m);
   }
@@ -116,19 +113,18 @@ class MemoRepositoryTests {
     result.get().forEach(memo -> System.out.println(memo));
   }
 
-  @Transactional // 삭제할 때 필요함
-  @Commit // 삭제할 때 필요함
+  @Transactional  // 삭제할때 필요함.
+  @Commit   // 삭제할때 필요함.
   @Test
   public void testDeleteMemoByMnoLessThan() {
     memoRepository.deleteMemoByMnoLessThan(10L);
-
   }
+
 
   @Test
   public void testGetListDesc() {
     List<Memo> result = memoRepository.getListDesc();
-    for (Memo m : result) System.out.println(m);
-
+    for(Memo m : result) System.out.println(m);
   }
 
   @Test
@@ -137,6 +133,3 @@ class MemoRepositoryTests {
   }
 
 }
-
-
-
