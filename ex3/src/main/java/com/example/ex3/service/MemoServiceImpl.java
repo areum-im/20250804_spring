@@ -32,7 +32,7 @@ public class MemoServiceImpl implements MemoService {
   }
 
   @Override
-  public MemoDTO registMemo(MemoDTO memoDTO) {
-    return null;
+  public void registMemo(MemoDTO memoDTO) {
+    memoRepository.save(dtoToEntity(memoDTO));
   }
 }

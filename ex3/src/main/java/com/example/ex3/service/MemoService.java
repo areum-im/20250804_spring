@@ -8,7 +8,6 @@ import java.util.List;
 public interface MemoService {
   List<MemoDTO> getMemoList();
   List<MemoDTO> getMemoPage(int page);
-  MemoDTO registMemo(MemoDTO memoDTO);
 
   default Memo dtoToEntity(MemoDTO memoDTO) {
     return Memo.builder()
@@ -23,4 +22,5 @@ public interface MemoService {
         .build();
   }
 
+  void registMemo(MemoDTO memoDTO);
 }

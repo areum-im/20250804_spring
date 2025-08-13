@@ -10,4 +10,5 @@ public class Ex1Application {
 		SpringApplication.run(Ex1Application.class, args);
 		System.out.println("http://localhost:8080");
 	}
+
 }

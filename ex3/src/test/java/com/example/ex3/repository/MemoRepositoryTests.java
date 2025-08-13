@@ -129,7 +129,7 @@ class MemoRepositoryTests {
 
   @Test
   public void testUpdateMemoText() {
-    System.out.println(memoRepository.updateMemoText(11L, "Update ten"));
+    System.out.println(memoRepository.updateMemoText(10L, "Update ten"));
   }
 
 }
