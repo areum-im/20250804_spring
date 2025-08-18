@@ -1,11 +1,17 @@
 package com.example.ex4.controller;
 
+import com.example.ex4.dto.GuestbookDTO;
+import com.example.ex4.dto.PageRequestDTO;
+import com.example.ex4.dto.PageResultDTO;
 import com.example.ex4.service.GuestbookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/guestbook")
@@ -16,8 +22,27 @@ public class GuestbookController {
   private final GuestbookService guestbookService;
 
   @GetMapping({"","/","list"})
-  public String list() {
-    log.info("guestbook/list...............");
+  public String list(PageRequestDTO pageRequestDTO, Model model) {
+    log.info("guestbook/list..." + pageRequestDTO);
+    model.addAttribute("pageResultDTO", guestbookService.getList(pageRequestDTO));
     return "/guestbook/list";
   }
+  @GetMapping("/register")
+  public void register(){}
+  @PostMapping("/register")
+  public String registerPost(GuestbookDTO guestbookDTO, RedirectAttributes ra){
+    Long result = guestbookService.register(guestbookDTO);
+    log.info(">>"+result+" 번 글이 등록되었습니다.");
+    ra.addFlashAttribute("msg", result); // RedirectAttributes 일회성, 최종 view단까지 보냄
+    return "redirect:/guestbook/list";
+  }
+
+  @GetMapping({"/read", "/modify"})
+  public void read(Long gno, PageRequestDTO pageRequestDTO, Model model){
+    log.info(">>gno:"+gno);
+    log.info(">>pageRequestDTO:"+pageRequestDTO);
+    GuestbookDTO guestbookDTO = guestbookService.read(gno, pageRequestDTO);
+    model.addAttribute("guestbookDTO", guestbookDTO);
+  }
+
 }
