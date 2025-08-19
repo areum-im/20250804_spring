@@ -50,6 +50,9 @@
     </table>
     <ul class="pagination h-100 justify-content-center align-items-center">
       <li class="page-item" th:if="${pageResultDTO.prev}">
+<!--         현재 묶음이 11~20이면 start = 11 - > start-1 = 10-->
+<!--         즉 prev를 누르면 이전 묶음의 마지막 페이지(10)로 이동하게 설계 되어있음-->
+<!--         (사용자가 10에서 1~10중 원하는 번호로 이동할 수 있도록 하는 전형적인 UX 패턴)-->
         <a class="page-link" tabindex="-1"
            th:href="@{/guestbook/list(page=${pageResultDTO.start-1},type=${pageRequestDTO.type}
            ,keyword=${pageRequestDTO.keyword})}"
