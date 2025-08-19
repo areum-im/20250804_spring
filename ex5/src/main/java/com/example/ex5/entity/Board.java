@@ -15,6 +15,6 @@ public class Board extends BasicEntity {
   private Long bno;
   private String title;
   private String content;
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY) // 요청할 때 join이 됨
   private Member writer;
 }
