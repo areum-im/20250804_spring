@@ -1,4 +1,4 @@
-package com.example.ex4.dto;
+package com.example.ex5.dto;
 
 import lombok.Data;
 import org.springframework.data.domain.Page;

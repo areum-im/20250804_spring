@@ -89,9 +89,9 @@
         if(msg) {
           const myModal = new bootstrap.Modal(document.querySelector('#myModal'),{backdrop:true});
           document.querySelector(".modal-title").innerHTML=`<p>알림</p>`
-          document.querySelector(".modal-body").textContent=`${msg} 번 글이 등록되었습니다.`
+          document.querySelector(".modal-body").textContent=[[${msg}]]
           myModal.show()
-          history.replaceState({}, null, null)
+          history.replaceState({}, null, null) // 모달창 띄운 흔적을 history에서 제거
         }
         const frmSrch = document.querySelector('#frmSrch')
         const btnSrch = document.querySelector('.btnSrch')

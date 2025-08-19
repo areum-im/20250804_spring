@@ -1,4 +1,4 @@
-package com.example.ex4.entity;
+package com.example.ex5.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
