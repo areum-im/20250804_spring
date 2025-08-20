@@ -20,7 +20,7 @@ public class GuestbookController {
   // has-a관계  :: interface
   private final GuestbookService guestbookService;
 
-  // 페이지의 목록 요청, PageRequestDTO:요청된 페이지의 정보를 가진 객체
+  // 페이지의 목록 요청, PageRequestDTO : 요청된 페이지의 정보를 가진 객체
   @GetMapping({"","/","list"})
   public String list(PageRequestDTO pageRequestDTO, Model model) {
     log.info("guestbook/list..." + pageRequestDTO);

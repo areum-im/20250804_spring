@@ -6,10 +6,15 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -55,5 +60,24 @@ class BoardRepositoryTests {
     for (Object[] arr : result) {
       System.out.println(Arrays.toString(arr));
     }
+  }
+
+    @Test
+    public void testWithReplyCount() {
+      Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").descending());
+      Page<Object[]> result = boardRepository.getBoardWithReplyCount(pageable);
+      result.get().forEach(new Consumer<Object[]>() {
+        @Override
+        public void accept(Object[] row) {
+          Object[] arr = row;
+          System.out.println(Arrays.toString(arr));
+        }
+      });
+    }
+    @Test
+    public void testGetBoardByBno() {
+      Object result = boardRepository.getBoardByBno(100L);
+      Object[] arr = (Object[]) result;
+      System.out.println(Arrays.toString(arr));
   }
 }

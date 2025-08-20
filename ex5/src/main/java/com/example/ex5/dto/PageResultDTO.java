@@ -20,7 +20,7 @@ public class PageResultDTO<DTO, EN> {
   private boolean prev, next; // 다음, 이전 버튼에 대한 정보
   private List<Integer> pageList; // 페이지 번호 목록 :: page list
 
-  //Function(EN, DTO) fn -> fn : Entity를 받아서 DTO로 변환해주는 함수
+  // Function(EN, DTO) fn -> fn : Entity를 받아서 DTO로 변환해주는 함수
   public PageResultDTO(Page<EN> page, Function<EN, DTO> fn) {
 
     // page의 목록에 대한 리스트를 List타입으로 변경함.

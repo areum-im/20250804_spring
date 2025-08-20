@@ -16,5 +16,6 @@ public class Reply extends BasicEntity {
   private String text;
   private String commenter;
   @ManyToOne
-  private Board board;
+  private Board board; // 댓글이 어느 게시글 소속인지를 나타내는 핵심 연결 고리
+
 }
