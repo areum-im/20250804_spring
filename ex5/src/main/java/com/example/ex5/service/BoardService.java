@@ -15,7 +15,8 @@ public interface BoardService {
         .writer(Member.builder().email(boardDTO.getWriterEmail()).build())
         .build();
   }
-  default BoardDTO entitytoDto(Board board, Member member, Long replyCount) {
+
+  default BoardDTO entityToDto(Board board, Member member, Long replyCount) {
     BoardDTO boardDTO = BoardDTO.builder()
         .bno(board.getBno())
         .title(board.getTitle())
@@ -24,19 +25,21 @@ public interface BoardService {
         .modDate(board.getModDate())
         .writerEmail(member.getEmail())
         .writerName(member.getName())
-        .replyCount(replyCount.intValue()) // long => int
+        .replyCount(replyCount.intValue())// long => int
         .build();
     return boardDTO;
   }
 
-    Long register (BoardDTO boardDTO);
-  //PageresultDTO는 view단으로 가기 위함인데, 핵심인 BoardDTO만 따로 받고 나머지는 Object[]로 처리
-    PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+  Long register(BoardDTO boardDTO);
 
-    BoardDTO get(Long bno); // Board 상세보기
+  // PageResultDTO는 view로 갈때, 핵심인 BoardDTO만 받고 나머지는 Object[]로 처리
+  PageResultDTO<BoardDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
 
-  void removeWithReplies(Long bno); // Board를 지울 때 댓글도 같이 지우기
+  BoardDTO read(Long bno, PageRequestDTO pageRequestDTO); // Board 상세보기
 
-  void modify(BoardDTO boardDTO);
+  void removeWithReplies(Long bno); // Board를 지울때 댓글도 같이 지우기
+
+  Long modify(BoardDTO boardDTO, PageRequestDTO pageRequestDTO);
+
+//  Long remove(BoardDTO boardDTO);
 }
-

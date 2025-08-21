@@ -11,38 +11,39 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class BoardServiceImplTests {
-@Autowired
+  @Autowired
   private BoardService boardService;
 
-@Test
+  @Test
   public void testRegister() {
-  BoardDTO boardDTO = BoardDTO.builder()
-      .title("Title...")
-      .content("Content...")
-      .writerEmail("user1@a.a")
-      .build();
-  System.out.println(">>" + boardService.register(boardDTO));
-}
-
-@Test
-  public void testGetList() {
-  PageResultDTO<BoardDTO, Object[]> result = boardService.getList(new PageRequestDTO());
-  for (BoardDTO dto : result.getDtoList()) {
-    System.out.println(dto);
+    BoardDTO boardDTO = BoardDTO.builder()
+        .title("Test...")
+        .content("Content...")
+        .writerEmail("user1@a.a")
+        .build();
+    System.out.println(">>"+boardService.register(boardDTO));
   }
-}
 
-@Test
+  @Test
+  public void testGetList() {
+    PageResultDTO<BoardDTO, Object[]> result = boardService.getList(new PageRequestDTO());
+    for (BoardDTO dto : result.getDtoList()) {
+      System.out.println(dto);
+    }
+  }
+
+  @Test
   public void testDeleteByBno() {
-  boardService.removeWithReplies(1l);
-}
+    boardService.removeWithReplies(1l);
+  }
 
-@Test
+  @Test
   public void testModify() {
-  BoardDTO boardDTO = BoardDTO.builder()
-      .title("Updated")
-      .content("Updated")
-      .build();
-  boardService.modify(boardDTO);
-}
+    BoardDTO boardDTO = BoardDTO.builder()
+        .bno(3l)
+        .title("Updated")
+        .content("Updated")
+        .build();
+    boardService.modify(boardDTO, new PageRequestDTO());
+  }
 }

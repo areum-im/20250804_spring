@@ -1,6 +1,7 @@
 package com.example.ex5.repository;
 
 import com.example.ex5.entity.Board;
+import com.example.ex5.repository.search.SearchBoardRepository;
 import org.springframework.data.annotation.QueryAnnotation;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,8 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<Board, Long> {
+public interface BoardRepository extends JpaRepository<Board, Long>, SearchBoardRepository {
+// SearchBoardRepository : 복수개의 엔티티를 검색하기 위해 별도의 interface로 분리
 
   // @Query() : jpql 활용해 조인하는 법을 보여주고 있음
   // 연관관계가 있는 경우 :: board 기준 board가 member를 참조하기 때문에 left join을 적용

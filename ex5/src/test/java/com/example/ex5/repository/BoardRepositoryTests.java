@@ -80,4 +80,21 @@ class BoardRepositoryTests {
       Object[] arr = (Object[]) result;
       System.out.println(Arrays.toString(arr));
   }
+
+  @Test
+  public void testSearchtest() {
+   Board b = boardRepository.searchTest();
+    System.out.println(b);
+  }
+
+  @Test
+  public void testSearchPage() {
+    Pageable pageable = PageRequest.of(0, 10, Sort.by("bno").ascending()
+    );
+    Page<Object[]> result = boardRepository.searchPage("t", "1", pageable);
+    result.get().forEach(row -> {
+      Object[] arr = (Object[]) row;
+      System.out.println(Arrays.toString(arr));
+    });
+  }
 }

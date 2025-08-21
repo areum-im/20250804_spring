@@ -15,7 +15,10 @@ public class Reply extends BasicEntity {
   private Long rno;
   private String text;
   private String commenter;
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   private Board board; // 댓글이 어느 게시글 소속인지를 나타내는 핵심 연결 고리
+  public void changeText(String text) {
+    this.text = text;
+  }
 
 }

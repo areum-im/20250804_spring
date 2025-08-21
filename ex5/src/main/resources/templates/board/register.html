@@ -17,9 +17,9 @@
                        placeholder="내용">
             </div>
             <div class="form-group">
-                <label for="writer">Writer</label>
-                <input type="text" name="writer" id="writer" class="form-control"
-                       placeholder="작성자" value="user1">
+                <label for="writerEmail">Writer</label>
+                <input type="text" name="writerEmail" id="writerEmail" class="form-control"
+                       placeholder="작성자" value="user1@a.a">
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary btn-register">Submit</button>
@@ -40,9 +40,9 @@
                     content.setAttribute('placeholder', "내용을 입력해주세요")
                     content.focus();return;
                 }
-                if(!writer.value){
-                    writer.setAttribute('placeholder', "작성자을 입력해주세요")
-                    writer.focus();return;
+                if(!writerEmail.value){
+                    writerEmail.setAttribute('placeholder', "작성자을 입력해주세요")
+                    writerEmail.focus();return;
                 }
                 document.querySelector("form").submit();
             }
