@@ -64,4 +64,6 @@ public interface MovieService {
   Long register(MovieDTO movieDTO);
 
   PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO);
+
+  MovieDTO get(Long mno);
 }

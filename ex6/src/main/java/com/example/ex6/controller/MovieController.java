@@ -20,7 +20,8 @@ public class MovieController {
   private final MovieService movieService;
 
   @GetMapping("register")
-  public void register(){}
+  public void register() {
+  }
 
   @PostMapping("/register")
   public String register(MovieDTO movieDTO, RedirectAttributes ra) {
@@ -31,8 +32,16 @@ public class MovieController {
 
   @GetMapping({"", "/", "/list"})
   public String list(PageRequestDTO pageRequestDTO, Model model) {
-    model.addAttribute("result", movieService.getList(pageRequestDTO));
+    model.addAttribute("pageResultDTO", movieService.getList(pageRequestDTO));
     return "/movie/list";
   }
 
+  @GetMapping({"/read", "/modify"}) // modify 화면도 같은 DTO를 재사용할 수 있도록 묶어둡니다(선택).
+  public void read(Long mno, PageRequestDTO pageRequestDTO, Model model) {
+    model.addAttribute("movieDTO", movieService.get(mno));
+    log.info("READ mno={}, pageReq={}", mno, pageRequestDTO);
+
+    MovieDTO movieDTO = movieService.get(mno); // 상세 조회 서비스 호출 (아래 2번 참고)
+    // view 이름은 요청 경로에 따라 /movie/read.html 또는 /movie/modify.html 를 자동으로 찾습니다.
+  }
 }
