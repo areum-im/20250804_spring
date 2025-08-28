@@ -44,4 +44,6 @@ public class MovieController {
     MovieDTO movieDTO = movieService.get(mno); // 상세 조회 서비스 호출 (아래 2번 참고)
     // view 이름은 요청 경로에 따라 /movie/read.html 또는 /movie/modify.html 를 자동으로 찾습니다.
   }
+
+  @
 }

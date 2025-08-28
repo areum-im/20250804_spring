@@ -19,7 +19,7 @@ public class ReviewController {
   private final ReviewService reviewService;
 
   @GetMapping(value = "/{mno}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity<List<ReviewDTO>> getListByMovie(@PathVariable("mno") Long mno) { //@PathVariable : 글번호로 목록 뽑아내기
+  public ResponseEntity<List<ReviewDTO>> getListByMovie(@PathVariable("mno") Long mno) {
     return new ResponseEntity<>(reviewService.getList(mno), HttpStatus.OK);
   }
 
@@ -36,6 +36,7 @@ public class ReviewController {
 
   @DeleteMapping(value = "/{reviewNum}")
   public ResponseEntity<String> delete(@PathVariable Long reviewNum) {
+    log.info("delete..." + reviewNum);
     reviewService.remove(reviewNum);
     return new ResponseEntity<>(reviewNum + "번 리뷰 삭제", HttpStatus.OK);
   }
