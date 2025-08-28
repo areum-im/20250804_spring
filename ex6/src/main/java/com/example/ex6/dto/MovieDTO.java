@@ -17,6 +17,7 @@ public class MovieDTO {
   private Long mno;
   private String title;
 
+  // @Builder는 null로 초기화, @Builder
 @Builder.Default
   private List<MovieImageDTO> imageDTOList = new ArrayList<>();
 
