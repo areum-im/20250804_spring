@@ -45,5 +45,17 @@ public class MovieController {
     // view 이름은 요청 경로에 따라 /movie/read.html 또는 /movie/modify.html 를 자동으로 찾습니다.
   }
 
-  @
+  @GetMapping("/modify")
+  public void modify(Long mno, PageRequestDTO pageRequestDTO, Model model) {
+    model.addAttribute("movieDTO", movieService.get(mno));
+
+  }
+
+  @PostMapping("/modify")
+  public String modify(MovieDTO movieDTO, PageRequestDTO pageRequestDTO,
+                       RedirectAttributes ra) {
+    movieService.modify(movieDTO);  // 수정 처리
+    ra.addAttribute("page", pageRequestDTO.getPage());
+    return "redirect:/movie/list";   // 목록으로 이동
+  }
 }

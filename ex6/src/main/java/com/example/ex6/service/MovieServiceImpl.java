@@ -5,6 +5,7 @@ import com.example.ex6.dto.PageRequestDTO;
 import com.example.ex6.dto.PageResultDTO;
 import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.MovieImage;
+import com.example.ex6.entity.Review;
 import com.example.ex6.repository.MovieImageRepository;
 import com.example.ex6.repository.MovieRepository;
 import jakarta.transaction.Transactional;
@@ -15,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -72,5 +70,16 @@ public class MovieServiceImpl implements MovieService {
     double avg = (Double) result.get(0)[2];
     Long reviewCnt = (Long) result.get(0)[3];
     return entitiesToDTO(movie, movieImages, avg, reviewCnt);
+  }
+
+  @Override
+  public MovieDTO modify(MovieDTO movieDTO) {
+    Optional<Review> result = movieRepository.findById(movieDTO.getMno());
+    if (result.isPresent()) {
+      Movie movie = result.get().getMovie();
+      movie.changeTitle(movieDTO.getTitle());
+      movieRepository.save(movie);
+    }
+    List<MovieImage> existingImages = movieImageRepository.findByMovie()
   }
 }
