@@ -36,7 +36,7 @@ public class MovieController {
     return "/movie/list";
   }
 
-  @GetMapping({"/read", "/modify"}) // modify 화면도 같은 DTO를 재사용할 수 있도록 묶어둡니다(선택).
+  @GetMapping("/read") // modify 화면도 같은 DTO를 재사용할 수 있도록 묶어둡니다(선택).
   public void read(Long mno, PageRequestDTO pageRequestDTO, Model model) {
     model.addAttribute("movieDTO", movieService.get(mno));
     log.info("READ mno={}, pageReq={}", mno, pageRequestDTO);
@@ -52,10 +52,37 @@ public class MovieController {
   }
 
   @PostMapping("/modify")
-  public String modify(MovieDTO movieDTO, PageRequestDTO pageRequestDTO,
-                       RedirectAttributes ra) {
-    movieService.modify(movieDTO);  // 수정 처리
+  public String modify(MovieDTO movieDTO, PageRequestDTO pageRequestDTO, RedirectAttributes ra)  { // 수정됐다고 일회성 알림 날려줄거니까 RedirectAttributes 사용
+    log.info("modify...movieDTO:" + movieDTO); // movieDTO에는 mno, title, imageDTOList가 넘어옴
+    movieService.modify(movieDTO); // Service로 이동
+    ra.addFlashAttribute("msg", movieDTO.getMno() + "수정");
+    ra.addAttribute("mno", movieDTO.getMno());
     ra.addAttribute("page", pageRequestDTO.getPage());
-    return "redirect:/movie/list";   // 목록으로 이동
+    ra.addAttribute("type", pageRequestDTO.getType());
+    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
+   return "redirect:/movie/read";   // 목록으로 이동
+  }
+
+  @PostMapping("/remove")
+  public String remove(MovieDTO movieDTO,
+                       PageRequestDTO pageRequestDTO, RedirectAttributes ra) {
+    movieService.removeWithReviewsAndMovieImages(movieDTO.getMno());
+    if (movieService.getList(pageRequestDTO).getDtoList().size() == 0
+        && pageRequestDTO.getPage() != 1) {
+      pageRequestDTO.setPage(pageRequestDTO.getPage() - 1);
+    }
+    typeKeywordInit(pageRequestDTO);  //null 문자열을 삭제처리
+    ra.addFlashAttribute("msg", movieDTO.getMno()+" 번 글이 삭제되었습니다.");
+    ra.addAttribute("page", pageRequestDTO.getPage());
+    ra.addAttribute("type", pageRequestDTO.getType());
+    ra.addAttribute("keyword", pageRequestDTO.getKeyword());
+    return "redirect:/movie/list";
+  }
+
+  private void typeKeywordInit(PageRequestDTO pageRequestDTO){
+    if (pageRequestDTO.getType().equals("null")) pageRequestDTO.setType("");
+    if (pageRequestDTO.getKeyword().equals("null")) pageRequestDTO.setKeyword("");
   }
 }
+
+

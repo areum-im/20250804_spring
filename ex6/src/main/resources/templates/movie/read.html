@@ -3,20 +3,62 @@
 <th:block th:replace="~{layout/basic::setContent(~{this::content})}">
     <th:block th:fragment="content">
         <style>
-            .form-group {margin-bottom: 20px;}
-            .modal-body input {margin-bottom: 10px;}
-            .uploadResult {width: 100%;background: gray;margin-top: 10px;}
-            .uploadResult ul {
-                display: flex;flex-flow: row;justify-content: center;
-                align-items: center;vertical-align: top;overflow: auto;
+            .form-group {
+                margin-bottom: 20px;
             }
-            .uploadResult ul li {list-style: none;padding: 10px;margin-left: 2em;}
-            .uploadResult ul li img {width: 100px;}
-            .star {position: relative;font-size: 2rem;color: #ddd;}
-            .star input {width: 100%;height: 100%;position: absolute;left: 0;
-                opacity: 0;cursor: pointer;}
-            .star span {width: 0;position: absolute;left: 0;color: #ffc83d;
-                overflow: hidden;pointer-events: none;-webkit-text-stroke: 2px black;
+
+            .modal-body input {
+                margin-bottom: 10px;
+            }
+
+            .uploadResult {
+                width: 100%;
+                background: gray;
+                margin-top: 10px;
+            }
+
+            .uploadResult ul {
+                display: flex;
+                flex-flow: row;
+                justify-content: center;
+                align-items: center;
+                vertical-align: top;
+                overflow: auto;
+            }
+
+            .uploadResult ul li {
+                list-style: none;
+                padding: 10px;
+                margin-left: 2em;
+            }
+
+            .uploadResult ul li img {
+                width: 100px;
+            }
+
+            .star {
+                position: relative;
+                font-size: 2rem;
+                color: #ddd;
+            }
+
+            .star input {
+                width: 100%;
+                height: 100%;
+                position: absolute;
+                left: 0;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .star span {
+                width: 0;
+                position: absolute;
+                left: 0;
+                color: #ffc83d;
+                overflow: hidden;
+                pointer-events: none;
+                -webkit-text-stroke: 2px black;
             }
         </style>
         <h1 class="mt-4">Movie Read Page</h1>
@@ -56,8 +98,8 @@
         <div class="uploadResult">
             <ul>
                 <li th:if="${movieDTO.imageDTOList.size()>0 && movieDTO.imageDTOList[0].path != null}"
-                    th:each="movieImageDTO : ${movieDTO.imageDTOList}" th:data-file="${movieImageDTO.getThumbnailURL}"
-                    style="cursor:pointer;">
+                    th:each="movieImageDTO : ${movieDTO.imageDTOList}" th:data-file="${movieImageDTO.getImageURL}"
+                    th:onclick="viewPicture([[${movieImageDTO.getImageURL}]])" style="cursor:pointer;">
                     <img th:if="${movieImageDTO.path != null}"
                         th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
                 </li>
@@ -95,6 +137,8 @@
             // 다큐먼트 읽고 난 뒤 실행되는 스크립트
             window.onload = () => {
                 var msg = [[${ msg }]] // 수정후 넘어오는 수정메시지
+                loadReviewJSON() // 리뷰을 REST하게 불러오는 함수 호출
+                if (msg === '' || history.state) return// 모달창 안띄우는 코드 
                 if (msg) {
                     // 수정후 변경사항을 위한 모달 인스턴스 생성
                     const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: true });
@@ -102,9 +146,8 @@
                     document.querySelector("#exampleModalLabel")
                         .innerHTML = `<p>${msg.split(" ")[2]}창</p>`
                     myModal.show()
-                    history.replaceState({}, null, null)
                 }
-                loadReviewJSON() // 리뷰을 REST하게 불러오는 함수 호출
+                history.replaceState({}, null, null)
             }
 
             // 리뷰목록을 불러오는 함수
@@ -156,7 +199,8 @@
                             for (let j = 0; j < starRatings[i].dataset.grade; j++) {
                                 strStar += "⭐" //하나의 리뷰가 가지는 grade를 ⭐로 표시.
                             }
-                            starRatings[i].innerHTML = strStar; // 별점 문자열을 HTML 내부로 넣어서 보여주기 위해 붙임
+                            // 별점 문자열을 HTML 내부로 넣어서 보여주기 위해 붙임(돔트리에 str을 마운트 시킴)
+                            starRatings[i].innerHTML = strStar;
                         }
                     })
             }
@@ -166,15 +210,13 @@
                     + `/${len2(date.getDate())} ${len2(date.getHours())}:`
                     + `${len2(date.getMinutes())}`
             }
-            function len2(num) { return (num < 10) ? "0" + num : num;} //2자리 맞춤 함수 
-            
+            function len2(num) { return (num < 10) ? "0" + num : num; } //2자리 맞춤 함수 
+
             // 별을 클릭할 때마다 grade의 수치를 생성해주는 함수
             function drawStar(target) { document.querySelector('.star span').style.width = `${target.value * 10}%` }
 
             // 리뷰 저장 모달 창 띄우기
             function addReview() {
-                // 리뷰 추가하기 위한 모달 인스턴스 생성
-                const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: true });
                 // 모달 창 제목
                 document.querySelector("#exampleModalLabel").textContent = "Review 추가하기"
                 // 모달 바디
@@ -194,11 +236,13 @@
                     <button type="button" class="btn btn-primary save" onclick="saveReview()">등록</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
                 `
+                // 리뷰 추가하기 위한 모달 인스턴스 생성
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: true });
                 myModal.show() // 모달 인스턴스를 실제 보여주는 함수
             }
-            
+
             // 리뷰 저장 하기
-            function saveReview() { 
+            function saveReview() {
                 // 리뷰를 저장하기 위한 3가지(mid, text, grade)
                 let mid = document.querySelector(".modal-body input[name='mid']")
                 let text = document.querySelector(".modal-body input[name='text']")
@@ -223,7 +267,7 @@
 
                 // 리뷰 등록을 위한 자바스크립트 객체 선언
                 let review = { mno: mno, text: text.value, mid: mid.value, grade: grade }
-                
+
                 const url = /*[[@{/reviews}]]*/'url'  // 리뷰를 저장하는 주소
                 fetch(url, {
                     method: 'POST', headers: { 'Content-type': 'application/json' },
@@ -270,7 +314,7 @@
 
                 myModal.show() // 모달 나타내기
             }
-            
+
             // 리뷰 수정 하기
             function modifyReview(reviewNum) {
                 // 유효성검사, 수정url로 데이터 보내기, 모달창 변경
@@ -291,8 +335,10 @@
                 const modal = bootstrap.Modal.getInstance(myModalEl);
                 modal.hide();
 
-                let review = {mno: mno, text: text.value, mid: mid.value
-                              , grade: grade, reviewNum: reviewNum}
+                let review = {
+                    mno: mno, text: text.value, mid: mid.value
+                    , grade: grade, reviewNum: reviewNum
+                }
                 //alert(JSON.stringify(review))
                 const url = /*[[@{/reviews}]]*/'url'
                 fetch(url, {
@@ -317,7 +363,7 @@
                 const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: true });
                 let review = { reviewNum: reviewNum }
                 const url = /*[[@{/reviews/}]]*/'url'
-                fetch(url+reviewNum, {
+                fetch(url + reviewNum, {
                     method: 'DELETE', headers: { 'Content-type': 'application/json' },
                 })
                     .then(res => res.text()) // json(),text(),blob(),formData(),arrayBuffer()
@@ -333,6 +379,15 @@
                     })
             }
 
+            // 원본 이미지 보기
+            function viewPicture(file) {
+                const myModal = new bootstrap.Modal(document.querySelector('#myModal'), { backdrop: true });
+                const url = /*[[@{/display}]]*/'url'
+                document.querySelector(".modal-title").innerHTML = `<p>원본 이미지</p>`
+                document.querySelector(".modal-body").innerHTML =
+                    `<img style='width: 100%' src='${url}?fileName=${file}'>`
+                myModal.show();
+            }
         </script>
     </th:block>
 </th:block>

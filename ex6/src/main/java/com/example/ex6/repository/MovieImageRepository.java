@@ -16,9 +16,12 @@ public interface MovieImageRepository extends JpaRepository<MovieImage, Long> {
 
   @Query("select mi from MovieImage mi where mi.movie.mno=:mno")
   List<MovieImage> findByMno(@Param("mno") Long mno);
+  // modify()에서 기존 이미지 조회 후 삭제할 때 사용
   List<MovieImage> findByMovie(Movie movie);
 
   @Modifying
   @Query("delete from MovieImage mi where mi.movie.mno=:mno")
   void deleteByMno(@Param("mno") long mno);
+  // 조회 없이 한 번에 이미지 싹 지울 때 사용
+  void deleteByMovie(@Param("movie")Movie movie);
 }

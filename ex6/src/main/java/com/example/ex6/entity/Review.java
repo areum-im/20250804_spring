@@ -27,4 +27,5 @@ public class Review extends BasicEntity {
   public void changeText(String text) {
     this.text = text;
   }
+}
 
