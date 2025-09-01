@@ -1,15 +1,15 @@
 package com.example.ex6.repository;
 
 import com.example.ex6.entity.Movie;
+import com.example.ex6.repository.search.SearchRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface MovieRepository extends JpaRepository<Movie, Long> {
+public interface MovieRepository extends JpaRepository<Movie, Long>, SearchRepository {
 
   // 2개(Movie와 Review) 조인해서 평점과 갯수만 출력
   @Query("select m, avg(coalesce(r.grade,0)), count(distinct r) " +
@@ -33,11 +33,20 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 //  Page<Object[]> getListPageMaxMi(Pageable pageable);
 
   // 3개(Movie, Review, MovieImage) 조인해서 평점, 갯수, 가장최근 등록된 MovieImage 정보1개
+  // MovieImage가 비어있을 때 나오지 않는 문제 발생
+//  @Query("select m, mi, avg(coalesce(r.grade,0)), count(distinct r) from Movie m " +
+//      "left outer join MovieImage mi on mi.movie = m " +
+//      "left outer join Review     r  on r.movie  = m " +
+//      "where inum = (select max(mi2.inum) from MovieImage mi2 where mi2.movie=m) " +
+//      "group by m ")
+//  Page<Object[]> getListPageMaxMi(Pageable pageable);
+
   @Query("select m, mi, avg(coalesce(r.grade,0)), count(distinct r) from Movie m " +
-      "left outer join MovieImage mi on mi.movie = m " +
-      "left outer join Review     r  on r.movie  = m " +
-      "where inum = (select max(mi2.inum) from MovieImage mi2 where mi2.movie=m) " +
-      "group by m ")
+      "left outer join MovieImage mi on mi.movie = m and mi.inum = (" +
+      "  select max(mi2.inum) from MovieImage mi2 where mi2.movie = m" +
+      ") " +
+      "left outer join Review r on r.movie = m " +
+      "group by m")
   Page<Object[]> getListPageMaxMi(Pageable pageable);
 
 
@@ -53,6 +62,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
       "left outer join Review r on r.movie = m " +
       "where m.mno=:mno group by mi ")
   List<Object[]> getMovieWithAll(Long mno);
-
 
 }

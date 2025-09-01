@@ -7,9 +7,7 @@ import com.example.ex6.dto.PageResultDTO;
 import com.example.ex6.entity.Movie;
 import com.example.ex6.entity.MovieImage;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,11 +50,20 @@ public interface MovieService {
         .regDate(movie.getRegDate())
         .modDate(movie.getModDate())
         .build();
-    List<MovieImageDTO> movieImageDTOList = movieImages.stream().map(mi -> {
-      return MovieImageDTO.builder()
-          .path(mi.getPath()).imgName(mi.getImgName())
-          .uuid(mi.getUuid()).build();
-    }).collect(Collectors.toList());
+
+    // movieImages가 null이거나 비어있는 경우를 안전하게 처리
+    List<MovieImageDTO> movieImageDTOList =
+        // movieImages가 비어 있으면 new ArryList<>()를 하고
+        (movieImages == null || movieImages.isEmpty()) ? new ArrayList<>() :
+        // 아니면
+        movieImages.stream()
+            .filter(Objects::nonNull)
+            .map(mi -> MovieImageDTO.builder()
+                .path(mi.getPath())
+                .imgName(mi.getImgName())
+                .uuid(mi.getUuid())
+                .build()
+            ).collect(Collectors.toList());
     movieDTO.setImageDTOList(movieImageDTOList);
     movieDTO.setAvg(avg);
     movieDTO.setReviewCnt(reviewCnt.intValue());
@@ -71,6 +78,7 @@ public interface MovieService {
 
   void modify(MovieDTO movieDTO);
 
-  List<String> removeWithReviewsAndMovieImages(Long mno);
+  void removeWithReviewsAndMovieImages(Long mno);
 
+  void removeMovieImagebyUUID(String uuid);
 }

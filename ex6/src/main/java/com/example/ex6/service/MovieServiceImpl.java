@@ -48,7 +48,10 @@ public class MovieServiceImpl implements MovieService {
   @Override
   public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("mno").descending());
-    Page<Object[]> result = movieRepository.getListPageMaxMi(pageable);
+//    Page<Object[]> result = movieRepository.getListPageMaxMi(pageable);
+    Page<Object[]> result = movieRepository.search(
+        pageRequestDTO.getType(), pageRequestDTO.getKeyword(), pageable
+    );
     Function<Object[], MovieDTO> fn = new Function<Object[], MovieDTO>() {
       @Override
       public MovieDTO apply(Object[] arr) {
@@ -84,7 +87,6 @@ public class MovieServiceImpl implements MovieService {
     return entitiesToDTO(movie, movieImages, avg, reviewCnt);
   }
 
-  @Transactional
   @Override
   public void removeMovieImagebyUUID(String uuid) {
     movieImageRepository.deleteByUuid(uuid);
@@ -114,9 +116,11 @@ public class MovieServiceImpl implements MovieService {
         movieImageRepository.deleteByMno(movie.getMno());
         for (int i = 0; i < oldImageList.size(); i++) {
           MovieImage oldMovieImage = oldImageList.get(i);
-          String fileName = oldMovieImage.getPath() + File.separator
-              + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
-          deleteFile(fileName);
+          if (oldMovieImage.getPath() != null) {
+            String fileName = oldMovieImage.getPath() + File.separator
+                + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
+            deleteFile(fileName);
+          }
         }
       } else { // newImageList에 일부 변화 발생
         // 새로운 이미지를 추가하기 위한 forEach
@@ -131,17 +135,22 @@ public class MovieServiceImpl implements MovieService {
           if(!result1) movieImageRepository.save(movieImage);
         });
         // 없어진 이미지를 찾아서 삭제하기 위한 forEach문
-        oldImageList.forEach(oldMovieImage -> {
-          boolean result1 = false;
-          for (int i = 0; i < newImageList.size(); i++) {
-            result1 = newImageList.get(i).getUuid().equals(oldMovieImage.getUuid());
-            if(result1) break;
-          }
-          if(!result1) {
-            movieImageRepository.deleteByUuid(oldMovieImage.getUuid());
-            String fileName = oldMovieImage.getPath() + File.separator
-                + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
-            deleteFile(fileName);
+        oldImageList.forEach(new Consumer<MovieImage>() {
+          @Override
+          public void accept(MovieImage oldMovieImage) {
+            boolean result1 = false;
+            for (int i = 0; i < newImageList.size(); i++) {
+              result1 = newImageList.get(i).getUuid().equals(oldMovieImage.getUuid());
+              if (result1) break;
+            }
+            if (!result1) {
+              movieImageRepository.deleteByUuid(oldMovieImage.getUuid());
+              if (oldMovieImage.getPath() != null) {
+                String fileName = oldMovieImage.getPath() + File.separator
+                    + oldMovieImage.getUuid() + "_" + oldMovieImage.getImgName();
+                MovieServiceImpl.this.deleteFile(fileName);
+              }
+            }
           }
         });
       }
@@ -163,18 +172,34 @@ public class MovieServiceImpl implements MovieService {
 
   @Transactional
   @Override
-  public List<String> removeWithReviewsAndMovieImages(Long mno) {
+  public void removeWithReviewsAndMovieImages(Long mno) {
     List<MovieImage> list = movieImageRepository.findByMno(mno);
     List<String> result = new ArrayList<>();
+
     list.forEach(new Consumer<MovieImage>() {
       @Override
       public void accept(MovieImage t) {
         result.add(t.getPath() + File.separator + t.getUuid() + "_" + t.getImgName());
       }
     });
+    result.forEach(new Consumer<String>() {
+      @Override
+      public void accept(String fileName) {
+        try {
+          log.info("removeFile............" + fileName);
+          String srcFileName = URLDecoder.decode(fileName, "UTF-8");
+          File file = new File(uploadPath + File.separator + srcFileName);
+          file.delete();
+          File thumb = new File(file.getParent(), "s_" + file.getName());
+          thumb.delete();
+        } catch (Exception e) {
+          log.info("remove file : " + e.getMessage());
+        }
+      }
+    });
+
     movieImageRepository.deleteByMno(mno);
     reviewRepository.deleteByMno(mno);
     movieRepository.deleteById(mno);
-    return result;
   }
 }

@@ -40,12 +40,12 @@
             <div class="form-group">
                 <label for="regDate">Register Date</label>
                 <input type="text" id="regDate" class="form-control" readonly
-                    th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(movieDTO.regDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group">
                 <label for="modDate">Modified Date</label>
                 <input type="text" id="modDate" class="form-control" readonly
-                    th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
+                       th:value="${#temporals.format(movieDTO.modDate, 'yyyy/MM/dd hh:mm')}">
             </div>
             <div class="form-group fileForm">
                 <label for="fileInput">Select Image Files</label>
@@ -66,15 +66,19 @@
         <!-- 영화포스터가 있는 경우 출력해주는 부분 -->
         <div class="uploadResult">
             <ul>
-                <li th:if="${movieDTO.imageDTOList.size()>0 && movieDTO.imageDTOList[0].path != null}"
+                <li th:if="${movieDTO.imageDTOList.size()>0}"
                     th:each="movieImageDTO : ${movieDTO.imageDTOList}" th:data-path='${movieImageDTO.path}'
                     th:data-uuid='${movieImageDTO.uuid}' th:data-file='${movieImageDTO.getImageURL}'
                     th:data-name='${movieImageDTO.imgName}' style="cursor:pointer;">
                     <div>
                         <button type="button" th:onclick="javascript:this.closest('li').remove()">X
                         </button>
-                        <img th:if="${movieImageDTO.path != null}"
-                            th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|">
+                        <span th:if="${movieImageDTO.path != null}"><img
+                                th:src="|@{/display(fileName=${movieImageDTO.getThumbnailURL})}|"
+                                alt="poster"></span>
+                        <span th:if="${movieImageDTO.path == null}"><img
+                                src="https://placehold.co/70x100/lightblue/white?text=no+image\npath"
+                                alt="poster"></span>
                     </div>
                 </li>
             </ul>
@@ -109,7 +113,7 @@
                     title.setAttribute('placeholder', "제목을 입력해주세요")
                     title.focus(); return false;
                 }
-                // uploadResult에 있는 내용을 box에 hidden으로 옮기는 코드 
+                // uploadResult에 있는 내용을 box에 hidden으로 옮기는 코드
                 let str = ''
                 const liArr = document.querySelectorAll(".uploadResult ul li")
                 for (let i = 0; i < liArr.length; i++) {
@@ -125,6 +129,7 @@
             btnDelete.onclick = e => {
                 e.preventDefault();
                 frmModify.setAttribute('action', /*[[@{/movie/remove}]]*/'remove')
+
                 frmModify.submit();
             }
             btnBack.onclick = e => {
