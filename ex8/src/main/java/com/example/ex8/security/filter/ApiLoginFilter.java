@@ -1,5 +1,7 @@
 package com.example.ex8.security.filter;
 
+import com.example.ex8.security.dto.ClubAuthMemberDTO;
+import com.example.ex8.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,11 +16,14 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import java.io.IOException;
 
 @Log4j2
+// ApiLoginFilter : login 할 때 동작함
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
-  public ApiLoginFilter(String defaultFilterProcessesUrl) {
-    super(defaultFilterProcessesUrl);
-  }
+  private JWTUtil jwtUtil;
 
+  public ApiLoginFilter(String defaultFilterProcessesUrl, JWTUtil jwtUtil) {
+    super(defaultFilterProcessesUrl);
+    this.jwtUtil = jwtUtil;
+  }
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -26,7 +31,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     log.info("ApiLoginFilter..............attemptAuthentication");
     String email = request.getParameter("email");
-    String pass = "1";
+    String pass = request.getParameter("pass");
     if(email == null) throw new BadCredentialsException("Email cannot be null");
 
     // ClubUserDetailsService의 loadUserByUsername()를 호출하고 인증
@@ -38,6 +43,15 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
 
   @Override
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    super.successfulAuthentication(request, response, chain, authResult);
+    Object authObj = authResult.getPrincipal();
+    log.info("successful Authentication::" + authObj);
+    String email = ((ClubAuthMemberDTO) authObj).getEmail();
+    String token = null;
+    try {
+      token = jwtUtil.generateToken(email);
+      response.setContentType("text/plain");
+      response.getOutputStream().write(token.getBytes());
+      log.info("generated token: " + token);
+    } catch (Exception e) {e.printStackTrace();}
   }
 }

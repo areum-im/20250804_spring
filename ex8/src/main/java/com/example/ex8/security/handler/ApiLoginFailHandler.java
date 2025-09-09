@@ -25,6 +25,5 @@ public class ApiLoginFailHandler implements AuthenticationFailureHandler {
     json.put("message", message);
     PrintWriter out = response.getWriter();
     out.println(json);
-    
   }
 }

@@ -1,7 +1,6 @@
 package com.example.ex8.security.util;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 
@@ -12,24 +11,22 @@ import java.util.Date;
 @Log4j2
 public class JWTUtil {
   private String secretKey = "1234567890abcdefghijklmnopqrstuvwxyz";
-  private long expire = 60 * 24 * 30;
+  private long expire = 60 * 24 * 30; // 30일
 
   public String generateToken(String content) throws Exception {
     return Jwts.builder()
         .issuedAt(new Date())
-        .expiration(Date.from(ZonedDateTime.now().plusMinutes(expire).toInstant()))
+       // .expiration(Date.from(ZonedDateTime.now().plusMinutes(expire).toInstant()))
+        .expiration(Date.from(ZonedDateTime.now().plusSeconds(1).toInstant()))
         .claim("sub", content)
         .compact();
   }
 
   public String validateAndExtract(String tokenStr) throws Exception {
-    log.info("Jwts getClass; " +
-        Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
-            .build().parse(tokenStr)
-    );
-    Claims claims = (Claims) Jwts.parser().verifyWith(Keys.hmacShaKeyFor(
-        secretKey.getBytes(StandardCharsets.UTF_8)
-    )).build().parse(tokenStr).getPayload();
+    Jwt jwt = Jwts.parser().verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+        .build().parse(tokenStr);
+    log.info("Jwts getClass; " + jwt);
+    Claims claims = (Claims) jwt.getPayload();
     return (String) claims.get("sub");
   }
 }

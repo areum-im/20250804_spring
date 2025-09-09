@@ -1,5 +1,6 @@
 package com.example.ex8.security.filter;
 
+import com.example.ex8.security.util.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,9 +18,11 @@ import java.io.PrintWriter;
 public class ApiCheckFilter extends OncePerRequestFilter {
   private String[] pattern;
   private AntPathMatcher antPathMatcher;
+  private JWTUtil jwtUtil;
 
-  public ApiCheckFilter(String[] pattern) {
+  public ApiCheckFilter(String[] pattern, JWTUtil jwtUtil) {
     this.pattern = pattern;
+    this.jwtUtil = jwtUtil;
     antPathMatcher = new AntPathMatcher();
   }
 
@@ -60,10 +63,16 @@ public class ApiCheckFilter extends OncePerRequestFilter {
     boolean checkResult = false;
     String authHeader = request.getHeader("Authorization");
 
-    if (StringUtils.hasText(authHeader)) {
+    // JWT로 시작하는 경우 Basic 아닌, Bearer 시작
+    if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
       log.info("Authorization existed: " + authHeader);
-      if (authHeader.equals("12345678")) {
-        checkResult = true;
+      // if (authHeader.equals("12345678")) checkResult = true;
+      try {
+        String email = jwtUtil.validateAndExtract(authHeader.substring(7));
+        log.info("Validate result: " + email);
+        checkResult = email.length() > 0;
+      } catch (Exception e) {
+        throw new RuntimeException(e);
       }
     }
     return checkResult;

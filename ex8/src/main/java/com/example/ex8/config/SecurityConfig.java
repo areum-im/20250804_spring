@@ -3,7 +3,7 @@ package com.example.ex8.config;
 import com.example.ex8.security.filter.ApiCheckFilter;
 import com.example.ex8.security.filter.ApiLoginFilter;
 import com.example.ex8.security.handler.ApiLoginFailHandler;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
+import com.example.ex8.security.util.JWTUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -13,37 +13,67 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
   private static final String[] AUTH_WHITELIST = {
-      "/auth/login", "/auth/join"
+      "/"
+      , "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html"
+      , "/notes/**"
+  };
+  private static final String[] AUTH_CHECKLIST = {
+      // login된 사람들한테만 권한 줌
+      "/notes/**"
   };
 
+  // 주소 checking 위해 사용
   @Bean
   protected SecurityFilterChain config(HttpSecurity httpSecurity) throws Exception {
     httpSecurity.csrf(httpSecurityCsrfConfigurer -> httpSecurityCsrfConfigurer.disable());
-    httpSecurity.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+    httpSecurity.authorizeHttpRequests(auth ->
+        auth.requestMatchers(AUTH_WHITELIST).permitAll()
+            .anyRequest().denyAll()
+    );
+    httpSecurity.addFilterBefore(
+        // apiCheckFilter : token 유무 확인하는 곳
+        apiCheckFilter(AUTH_CHECKLIST),
+        UsernamePasswordAuthenticationFilter.class
+    );
+    httpSecurity.addFilterBefore(
+        apiLoginFilter(httpSecurity.getSharedObject(AuthenticationConfiguration.class)),
+        UsernamePasswordAuthenticationFilter.class
+    );
     return httpSecurity.build();
   }
 
   @Bean
-  PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+  PasswordEncoder passwordEncoder() {return new BCryptPasswordEncoder();}
 
   @Bean
-  public ApiCheckFilter apiCheckFilter() {
-    return new ApiCheckFilter(new String[]{"/notes/**/*"});
+  public ApiCheckFilter apiCheckFilter(String[] apiCheckList) {
+    return new ApiCheckFilter(apiCheckList, jwtUtil());
   }
 
   @Bean
   public ApiLoginFilter apiLoginFilter(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login", jwtUtil());
     apiLoginFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-    apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
-    return  apiLoginFilter;
+    apiLoginFilter.setAuthenticationFailureHandler(getApiLoginFailHandler());
+    return apiLoginFilter;
   }
+
+  @Bean
+  public JWTUtil jwtUtil() {
+    return new JWTUtil();
+  }
+
+  @Bean
+  public ApiLoginFailHandler getApiLoginFailHandler() {
+    return new ApiLoginFailHandler();
+  }
+
+
 }
