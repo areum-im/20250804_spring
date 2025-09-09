@@ -1,5 +1,6 @@
 package com.example.ex8.security.filter;
 
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,6 +19,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     super(defaultFilterProcessesUrl);
   }
 
+
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
       throws AuthenticationException, IOException, ServletException {
@@ -32,5 +34,10 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         new UsernamePasswordAuthenticationToken(email, pass);
     return getAuthenticationManager().authenticate(authToken);
 
+  }
+
+  @Override
+  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    super.successfulAuthentication(request, response, chain, authResult);
   }
 }

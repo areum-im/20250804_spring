@@ -2,6 +2,7 @@ package com.example.ex8.config;
 
 import com.example.ex8.security.filter.ApiCheckFilter;
 import com.example.ex8.security.filter.ApiLoginFilter;
+import com.example.ex8.security.handler.ApiLoginFailHandler;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,7 +43,7 @@ public class SecurityConfig {
   public ApiLoginFilter apiLoginFilter(AuthenticationConfiguration authenticationConfiguration) throws Exception {
     ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
     apiLoginFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-
+    apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
     return  apiLoginFilter;
   }
 }
