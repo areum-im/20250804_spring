@@ -2,7 +2,7 @@ package com.example.ex8.service;
 
 import com.example.ex8.dto.NoteDTO;
 import com.example.ex8.entity.Note;
-import com.example.ex8.repository.NoteRepository;
+import com.example.ex8.repository.NoteRespository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.weaver.ast.Not;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Log4j2
 public class NoteServiceImpl implements NoteService {
-  private final NoteRepository noteRespository;
+  private final NoteRespository noteRespository;
 
   @Override
   public Long register(NoteDTO noteDTO) {

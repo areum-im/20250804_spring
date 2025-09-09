@@ -1,8 +1,11 @@
 package com.example.ex8.config;
 
 import com.example.ex8.security.filter.ApiCheckFilter;
+import com.example.ex8.security.filter.ApiLoginFilter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -32,6 +35,14 @@ public class SecurityConfig {
 
   @Bean
   public ApiCheckFilter apiCheckFilter() {
-    return new ApiCheckFilter("/notes/**/*");
+    return new ApiCheckFilter(new String[]{"/notes/**/*"});
+  }
+
+  @Bean
+  public ApiLoginFilter apiLoginFilter(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
+    apiLoginFilter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
+
+    return  apiLoginFilter;
   }
 }
