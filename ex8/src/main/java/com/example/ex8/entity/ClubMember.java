@@ -15,7 +15,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Getter
 @ToString
-public class ClubMember extends BasicEntity {
+public class
+
+ClubMember extends BasicEntity {
   @Id
   private String email;
 

@@ -33,7 +33,13 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
       HttpServletRequest req, HttpServletResponse res, Authentication auth)
       throws IOException, ServletException {
     ClubAuthMemberDTO clubAuthMemberDTO = (ClubAuthMemberDTO) auth.getPrincipal();
-    // if(clubAuthMemberDTO.isFromSocial() )
+
+    // 처음 social 로그인 했을 때 페이지 이동
+    if (clubAuthMemberDTO.isFromSocial()
+        && passwordEncoder.matches("1", clubAuthMemberDTO.getPassword())) {
+      redirectStrategy.sendRedirect(req, res, "/auth/modify");
+      return;
+    }
 
     Collection<GrantedAuthority> authors =
         (Collection<GrantedAuthority>) clubAuthMemberDTO.getAuthorities();
@@ -42,7 +48,8 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler {
       public String apply(GrantedAuthority grantedAuthority) {
         return grantedAuthority.getAuthority();
       }
-    }).collect(Collectors.toList());
+    }).sorted().collect(Collectors.toList());
+    log.info(">>>>" + result);
     for (int i = 0; i < result.size(); i++) {
       String tmp = "";
       if(result.get(i).equals("ROLE_ADMIN")) tmp = "/sample/admin";

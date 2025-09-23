@@ -49,7 +49,7 @@ public class MovieServiceImpl implements MovieService {
   public PageResultDTO<MovieDTO, Object[]> getList(PageRequestDTO pageRequestDTO) {
     Pageable pageable = pageRequestDTO.getPageable(Sort.by("mno").descending());
 //    Page<Object[]> result = movieRepository.getListPageMaxMi(pageable);
-    Page<Object[]> result = movieRepository.search(
+    Page<Object[]> result = movieRepository.searchPage(
         pageRequestDTO.getType(), pageRequestDTO.getKeyword(), pageable
     );
     Function<Object[], MovieDTO> fn = new Function<Object[], MovieDTO>() {

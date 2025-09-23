@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface ClubMemberRepository extends JpaRepository<ClubMember, String> {
 
   @EntityGraph(attributePaths = {"roleSet"}, type = EntityGraph.EntityGraphType.LOAD)
-  @Query("select m from ClubMember m where m.fromSocial =:fromSocial and m.email=:email")
-  Optional<ClubMember> findByEmail(@Param("email") String email, boolean fromSocial);
+  @Query("select m from ClubMember m where m.email=:email")
+  Optional<ClubMember> findByEmail(@Param("email") String email);
 }

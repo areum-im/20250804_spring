@@ -32,4 +32,8 @@ public class ClubMember extends BasicEntity {
   // collection 이기 때문에 default 생성을 할 수 있다.
   @Builder.Default
   private Set<ClubMemberRole> roleSet = new HashSet<>();
+
+  public void setPassword(String password) {this.password = password;}
+
+  public void setName(String name) {this.name = name;}
 }
