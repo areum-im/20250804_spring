@@ -14,6 +14,7 @@ import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
   // Review에서 Member가 LAZY로 되었지만 이메서드에서는 조인을 하겠다는 표시
+  // @EntityGraph : 목록 그릴 때 닉네임/프로필 등 연관 데이터가 바로 필요하면 @EntityGraph로 같이 가져오면 성능이 좋아짐
   @EntityGraph(attributePaths = {"member"}, type = EntityGraph.EntityGraphType.FETCH)
   List<Review> findByMovie(Movie movie);
 
