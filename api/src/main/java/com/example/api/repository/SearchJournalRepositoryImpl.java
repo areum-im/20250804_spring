@@ -1,7 +1,6 @@
 package com.example.api.repository;
 
-import com.example.api.entity.Journal;
-import com.example.api.entity.QMembers;
+import com.example.api.entity.*;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
@@ -44,7 +43,7 @@ public class SearchJournalRepositoryImpl extends QuerydslRepositorySupport imple
 
     // 3) Tuple 생성:조인한 객체와 select를 활용해서 필요한 데이터를 tuple로 생성
     JPQLQuery<Tuple> tuple = jpqlQuery.select(
-        qJournal, qPhotos, qComments.likes.avg().coalesce(0.0) ,qComments.count()
+        qJournal, qPhotos, qComments.likes.sum().coalesce(0l) ,qComments.count()
     );
 
     // 4) 조건절 검색을 위한 객체 생성
@@ -60,7 +59,7 @@ public class SearchJournalRepositoryImpl extends QuerydslRepositorySupport imple
         switch (t) { // 화살표연산자 활용시 break 생략가능, default 필히포함(java 14+)
           case "t" -> conditionBuilder.or(qJournal.title.contains(keyword));
           case "w" -> conditionBuilder.or(qMembers.email.contains(keyword));
-          default -> conditionBuilder.or(qComments.text.contains(keyword));
+          default -> conditionBuilder.or(qJournal.content.contains(keyword));
         }
       } // 반복문 돌면서 발생한 조건 누적
       builder.and(conditionBuilder); //누적된 조건을 최초 조건과 합체
